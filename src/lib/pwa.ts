@@ -23,7 +23,7 @@ export function registerServiceWorker() {
 
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
-      navigator.serviceWorker.register("/sw.js").catch(() => undefined);
+      navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch(() => undefined);
     });
   }
   window.addEventListener("beforeinstallprompt", (event) => {
@@ -69,7 +69,7 @@ export function showTestReminder() {
   if (!("Notification" in window) || Notification.permission !== "granted") return false;
   new Notification("抱抱獭帮你夹住这里了", {
     body: "不用重新开始，下次从这个断点继续就好。",
-    icon: "/icons/otto-icon.svg"
+    icon: `${import.meta.env.BASE_URL}icons/otto-icon.svg`
   });
   return true;
 }

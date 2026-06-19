@@ -224,7 +224,7 @@ export default function App() {
                   <span />
                   <span />
                 </div>
-                <img src="/icons/otto-reference.png" alt={isZh ? "抱抱獭" : "Otto"} />
+                <img src={`${import.meta.env.BASE_URL}icons/otto-reference.png`} alt={isZh ? "抱抱獭" : "Otto"} />
                 <div className="otto-copy">
                   <strong>Otto</strong>
                   <p>{isZh ? "先说一句，我帮你抱住灵感。" : "Say one line. I will hold the idea."}</p>

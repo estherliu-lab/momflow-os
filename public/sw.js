@@ -1,5 +1,14 @@
-const CACHE_NAME = "momflow-cache-v5";
-const APP_SHELL = ["/", "/index.html", "/offline.html", "/manifest.json", "/icons/otto-reference.png", "/icons/otto-icon.svg"];
+const CACHE_NAME = "momflow-cache-v6";
+const scopePath = new URL(self.registration.scope).pathname.replace(/\/$/, "");
+const withScope = (path) => `${scopePath}${path}`;
+const APP_SHELL = [
+  withScope("/"),
+  withScope("/index.html"),
+  withScope("/offline.html"),
+  withScope("/manifest.json"),
+  withScope("/icons/otto-reference.png"),
+  withScope("/icons/otto-icon.svg")
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)));
@@ -27,7 +36,7 @@ self.addEventListener("fetch", (event) => {
           return response;
         })
         .catch(() => {
-          if (event.request.mode === "navigate") return caches.match("/offline.html");
+          if (event.request.mode === "navigate") return caches.match(withScope("/offline.html"));
           return undefined;
         });
     })
