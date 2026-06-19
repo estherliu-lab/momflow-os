@@ -4,6 +4,8 @@
 
 A tiny multilingual AI workspace for fragmented creators.
 
+[Open the app](https://ezekielgarden-arch.github.io/momflow-os/) | [GitHub repository](https://github.com/ezekielgarden-arch/momflow-os)
+
 MomFlow is a lightweight PWA that helps creators save ideas, recover from interruptions, and turn scattered thoughts into posts, scripts, and storyboards. It is warm, practical, slightly cute, and designed for real-life days when time never arrives in one perfect block.
 
 ---
@@ -15,6 +17,12 @@ MomFlow is a lightweight PWA that helps creators save ideas, recover from interr
 MomFlow is a gentle AI workspace for fragmented creators.
 
 It helps you capture tiny ideas, recover from interruptions, and turn scattered thoughts into useful content assets. You can install it to your phone home screen as a PWA, so it feels like a small app you can open at the exact moment an idea appears.
+
+### Try It
+
+Open MomFlow here:
+
+[https://ezekielgarden-arch.github.io/momflow-os/](https://ezekielgarden-arch.github.io/momflow-os/)
 
 ### Why It Is Useful
 
@@ -146,6 +154,12 @@ docs/
 MomFlow 是给碎片时间创作者的温柔 AI 工作台。
 
 它帮助你在被打断、低电量、只有几分钟的日子里，先抱住一个灵感，再把它慢慢变成图文、口播、视频脚本或分镜。它可以作为 PWA 添加到手机桌面，像一个轻量 App 一样随时打开。
+
+### 立即体验
+
+打开 MomFlow：
+
+[https://ezekielgarden-arch.github.io/momflow-os/](https://ezekielgarden-arch.github.io/momflow-os/)
 
 ### 为什么它有用
 
