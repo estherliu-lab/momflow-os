@@ -23,6 +23,8 @@ MomFlow is a gentle AI workspace for fragmented creators.
 
 It helps you capture tiny ideas, recover from interruptions, and turn scattered thoughts into useful content assets. You can install it to your phone home screen as a PWA, so it feels like a small app you can open at the exact moment an idea appears.
 
+MomFlow OS is also an open-source, lightweight AI workspace template. It does not include a public API key by default, so the project owner does not pay for every visitor's generation usage. Developers can connect their own DeepSeek, Qwen, Doubao, Kimi, OpenAI-compatible, or other model provider by following the setup guide.
+
 ### Try It
 
 Open MomFlow here:
@@ -111,6 +113,8 @@ MomFlow works even without an API key by using local templates. For real online 
 
 For production, use a backend proxy instead of calling model APIs directly from the browser. This protects API keys and lets you add rate limits, user accounts, moderation, and billing later.
 
+The public demo intentionally does not bundle a shared paid API key. This keeps the open-source project safe and affordable while making it easy for anyone to fork the repo and connect their own model account.
+
 DeepSeek proxy guide: [docs/deepseek-proxy.md](docs/deepseek-proxy.md)
 
 ### Voice Input Note
@@ -167,6 +171,8 @@ docs/
 MomFlow 是给碎片时间创作者的温柔 AI 工作台。
 
 它帮助你在被打断、低电量、只有几分钟的日子里，先抱住一个灵感，再把它慢慢变成图文、口播、视频脚本或分镜。它可以作为 PWA 添加到手机桌面，像一个轻量 App 一样随时打开。
+
+MomFlow OS / 抱抱獭工作台也是一个开源、轻量、可二次开发的 AI 工作台模板。项目默认不内置公共 API Key，这样不会让项目作者承担所有访问者的生成费用。感兴趣的开发者可以按照说明，接入自己的 DeepSeek、通义千问、豆包、Kimi、OpenAI-compatible 或其他模型服务。
 
 ### 立即体验
 
@@ -255,6 +261,8 @@ npm run preview
 - OpenAI
 
 正式上线时建议使用后端代理调用模型，避免 API Key 暴露在浏览器里。
+
+公开演示版不会内置共享的付费 API Key。这样既能保护开源项目的成本，也方便别人 fork 仓库后接入自己的模型账号继续开发。
 
 DeepSeek 代理配置说明：[docs/deepseek-proxy.md](docs/deepseek-proxy.md)
 
