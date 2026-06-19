@@ -1,29 +1,168 @@
+# MomFlow / 抱抱獭
+
+Choose your language:
+
+- [中文介绍](#中文介绍)
+- [English Introduction](#english-introduction)
+
+---
+
+## 中文介绍
+
 # 抱抱獭 MomFlow
 
-给碎片时间创作者的温柔 AI 工作台。  
-**MomFlow is a gentle AI workspace for fragmented creators.**
+给碎片时间创作者的温柔 AI 工作台。
 
-MomFlow 帮你在被打断、低电量、只有 5 分钟的日子里，先抱住一个灵感，再把它慢慢变成图文、口播、视频脚本或分镜。它可以作为 PWA 添加到手机桌面，像一个轻量 App 一样随时打开。
+MomFlow 帮你在被打断、低电量、只有几分钟的日子里，先抱住一个灵感，再把它慢慢变成图文、口播、视频脚本或分镜。它可以作为 PWA 添加到手机桌面，像一个轻量 App 一样随时打开。
 
-MomFlow helps creators capture tiny ideas, recover from interruptions, and turn scattered thoughts into posts, scripts, and storyboards. It is a lightweight PWA that can be installed to the phone home screen.
+### 为什么它有用
 
-## Why It Feels Useful
+- **快速保存灵感**：打开就能写一句，支持语音输入。
+- **断点恢复**：被打断时保存下一步，不用从头再来。
+- **内容生成**：本地模板先跑通，后续可接 DeepSeek、通义千问、GLM、豆包、OpenAI-compatible API。
+- **内容池管理**：灵感池、草稿池、分镜池、待发布、已发布，轻量管理创作流程。
+- **中英切换**：App 内中文模式全中文，英文模式全英文。
+- **添加到桌面**：支持 PWA 安装、离线页、通知权限和桌面快捷入口。
 
-- **一键抱住灵感 / Capture fast**: 打开就能写一句，支持语音输入。
-- **断点恢复 / Resume gently**: 被打断时保存下一步，不用从头再来。
-- **内容生成 / Create content**: 本地模板先跑通，后续可接 DeepSeek、Qwen、GLM、Doubao、OpenAI-compatible API。
-- **内容池 / Pipeline**: 灵感池、草稿池、分镜池、待发布、已发布，轻量管理创作流程。
-- **中英切换 / Bilingual UI**: 中文模式全中文，英文模式全英文。
-- **手机桌面 / Home screen**: 支持 PWA 安装、离线页、通知权限、桌面角标预留。
-
-## Product Name
+### 名字
 
 - 中文名：抱抱獭
 - 英文名：MomFlow
-- 角色名：Otto
-- 仓库名建议：`momflow-os`
+- 小动物角色名：Otto
+- 仓库名：`momflow-os`
 
-## Quick Start
+### 快速运行
+
+```bash
+npm install
+npm run dev
+```
+
+通常打开：
+
+```text
+http://localhost:5173/
+```
+
+生产构建：
+
+```bash
+npm run build
+```
+
+预览生产构建：
+
+```bash
+npm run preview
+```
+
+### 怎么使用
+
+1. 打开 MomFlow，在右上角选择中文或英文。
+2. 在首页选择今天的状态：能量、睡眠、环境和可用时间。
+3. 在“灵感”里保存一句想法，懒得打字时可以用语音输入。
+4. 到“生成”页选择平台、内容类型和风格。
+5. 生成草稿后，可以复制，也可以保存到内容池。
+6. 在“内容池”里继续推进草稿、分镜和待发布内容。
+7. 把它添加到手机桌面，下次有灵感时直接打开。
+
+### 添加到手机桌面
+
+**iPhone / Safari**
+
+1. 用 Safari 打开部署后的网站。
+2. 点分享按钮。
+3. 选择“添加到主屏幕”。
+4. 确认名称后点“添加”。
+
+**Android / Chrome**
+
+1. 用 Chrome 打开网站。
+2. 点“安装应用”或“添加到桌面”。
+3. 确认安装。
+
+### AI 设置
+
+不填 API Key 也能使用本地模板。想要更强的生成效果，可以在“我的 / 设置”里连接模型供应商：
+
+- DeepSeek
+- 阿里云百炼 / 通义千问
+- 智谱 GLM
+- 火山方舟 / 豆包
+- 百度千帆 / 文心
+- 自定义 OpenAI-compatible 接口
+- OpenAI
+
+正式上线时建议使用后端代理调用模型，避免 API Key 暴露在浏览器里。
+
+### 中国大陆使用说明
+
+MomFlow 可以面向中国大陆用户使用，但部署时建议：
+
+- 静态资源部署在大陆可访问的服务器或 CDN。
+- 图片和图标都放在项目 `public/` 里。
+- 优先选择 DeepSeek、通义千问、智谱 GLM、豆包、百度千帆等大陆用户更容易访问的模型。
+- 如果使用中国大陆正式域名，按需完成 ICP 备案和相关合规步骤。
+
+更多说明：[docs/mainland-china-guide.md](docs/mainland-china-guide.md)
+
+### 项目结构
+
+```text
+src/
+  App.tsx                  手机优先的 PWA 主界面
+  config.ts                角色、模式、平台、风格配置
+  i18n.ts                  中文和英文文案
+  lib/
+    generator.ts           本地生成模板
+    pwa.ts                 安装、提醒、Service Worker 辅助函数
+    storage.ts             IndexedDB 本地存储
+    ai/providers.ts        AI 供应商预设
+public/
+  manifest.json            PWA manifest
+  sw.js                    Service Worker
+  offline.html             离线页
+  icons/                   Otto 图标
+docs/
+  mainland-china-guide.md  中国大陆部署和 AI 接入说明
+  user-guide.md            用户使用指南
+```
+
+### 后续路线
+
+- 通过后端代理接入真实 AI 生成
+- 增加内容安全和平台规则检查
+- 增加定时提醒和 Web Push
+- 增加账号同步和云备份
+- 做原生小组件或 App 版本，让 Otto 有更丰富的桌面陪伴能力
+
+---
+
+## English Introduction
+
+# MomFlow
+
+A gentle AI workspace for fragmented creators.
+
+MomFlow helps creators capture tiny ideas, recover from interruptions, and turn scattered thoughts into posts, scripts, and storyboards. It is a lightweight PWA that can be installed to the phone home screen.
+
+### Why It Feels Useful
+
+- **Capture fast**: write one sentence immediately, with voice input support.
+- **Resume gently**: save the next step when interrupted instead of starting over.
+- **Create content**: local templates work by default, with room for DeepSeek, Qwen, GLM, Doubao, OpenAI-compatible APIs, and more.
+- **Manage a pipeline**: Ideas, Drafts, Storyboards, To Publish, and Published.
+- **Bilingual UI**: Chinese mode is fully Chinese; English mode is fully English.
+- **Home-screen ready**: PWA install, offline page, notification permission, and shortcut support.
+
+### Name
+
+- Chinese name: 抱抱獭
+- English name: MomFlow
+- Character name: Otto
+- Repository name: `momflow-os`
+
+### Quick Start
 
 ```bash
 npm install
@@ -48,7 +187,7 @@ Preview the production build:
 npm run preview
 ```
 
-## How To Use
+### How To Use
 
 1. Open MomFlow and choose Chinese or English from the top language button.
 2. Pick your current state: energy, sleep, context, and available time.
@@ -58,7 +197,7 @@ npm run preview
 6. Use **Pipeline** to continue drafts, storyboards, and publishing tasks.
 7. Add it to your phone home screen so it behaves like a tiny app.
 
-## Add To Home Screen
+### Add To Home Screen
 
 **iPhone / Safari**
 
@@ -73,9 +212,7 @@ npm run preview
 2. Tap **Install app** or **Add to Home screen**.
 3. Confirm installation.
 
-The app includes `manifest.json`, a service worker, icons, and an offline page, so it is ready for PWA deployment.
-
-## AI Setup
+### AI Setup
 
 MomFlow works even without an API key by using local templates. For stronger generation, connect a model provider in **Settings**:
 
@@ -89,7 +226,7 @@ MomFlow works even without an API key by using local templates. For stronger gen
 
 For production, use a backend proxy instead of calling model APIs directly from the browser. This protects API keys and lets you add rate limits, user accounts, moderation, and billing later.
 
-## Mainland China Notes
+### Mainland China Notes
 
 MomFlow can serve mainland China users, but deployment should avoid overseas-only dependencies:
 
@@ -100,29 +237,7 @@ MomFlow can serve mainland China users, but deployment should avoid overseas-onl
 
 More details: [docs/mainland-china-guide.md](docs/mainland-china-guide.md)
 
-## Project Structure
-
-```text
-src/
-  App.tsx                  Main mobile-first PWA interface
-  config.ts                Character, modes, platforms, styles
-  i18n.ts                  Chinese and English copy
-  lib/
-    generator.ts           Local generation templates
-    pwa.ts                 Install, reminders, service worker helpers
-    storage.ts             IndexedDB storage
-    ai/providers.ts        Model provider presets
-public/
-  manifest.json            PWA manifest
-  sw.js                    Service worker
-  offline.html             Offline fallback
-  icons/                   Otto app icons
-docs/
-  mainland-china-guide.md  Mainland deployment and AI notes
-  user-guide.md            End-user usage guide
-```
-
-## Roadmap
+### Roadmap
 
 - Real AI generation through a backend proxy
 - Content safety and platform-rule checks
