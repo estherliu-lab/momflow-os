@@ -1,0 +1,50 @@
+{
+  "id": "/",
+  "name": "抱抱獭 MomFlow",
+  "short_name": "MomFlow",
+  "description": "A gentle AI workspace for fragmented creators.",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#F8F3EA",
+  "theme_color": "#F8F3EA",
+  "orientation": "portrait-primary",
+  "categories": ["productivity", "lifestyle", "utilities"],
+  "icons": [
+    {
+      "src": "/icons/otto-reference.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/otto-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Save an idea",
+      "short_name": "Idea",
+      "description": "Capture one thought before it disappears.",
+      "url": "/?action=idea",
+      "icons": [{ "src": "/icons/otto-reference.png", "sizes": "1024x1024", "type": "image/png" }]
+    },
+    {
+      "name": "Resume checkpoint",
+      "short_name": "Checkpoint",
+      "description": "Continue from the place you paused.",
+      "url": "/?action=checkpoint",
+      "icons": [{ "src": "/icons/otto-reference.png", "sizes": "1024x1024", "type": "image/png" }]
+    },
+    {
+      "name": "Create storyboard",
+      "short_name": "Storyboard",
+      "description": "Turn an idea into a video storyboard.",
+      "url": "/?action=storyboard",
+      "icons": [{ "src": "/icons/otto-reference.png", "sizes": "1024x1024", "type": "image/png" }]
+    }
+  ]
+}
