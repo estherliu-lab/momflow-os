@@ -1,6 +1,6 @@
 {
   "id": ".",
-  "name": "抱抱獭 MomFlow",
+  "name": "MomFlow",
   "short_name": "MomFlow",
   "description": "A gentle AI workspace for fragmented creators.",
   "start_url": ".?source=pwa",
@@ -12,16 +12,22 @@
   "categories": ["productivity", "lifestyle", "utilities"],
   "icons": [
     {
-      "src": "icons/otto-reference.png",
-      "sizes": "1024x1024",
+      "src": "icons/app-icon-192.png",
+      "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icons/otto-icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
+      "src": "icons/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/app-icon-1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ],
   "shortcuts": [
@@ -30,21 +36,21 @@
       "short_name": "Idea",
       "description": "Capture one thought before it disappears.",
       "url": ".?action=idea",
-      "icons": [{ "src": "icons/otto-reference.png", "sizes": "1024x1024", "type": "image/png" }]
+      "icons": [{ "src": "icons/app-icon-192.png", "sizes": "192x192", "type": "image/png" }]
     },
     {
       "name": "Resume checkpoint",
       "short_name": "Checkpoint",
       "description": "Continue from the place you paused.",
       "url": ".?action=checkpoint",
-      "icons": [{ "src": "icons/otto-reference.png", "sizes": "1024x1024", "type": "image/png" }]
+      "icons": [{ "src": "icons/app-icon-192.png", "sizes": "192x192", "type": "image/png" }]
     },
     {
       "name": "Create storyboard",
       "short_name": "Storyboard",
       "description": "Turn an idea into a video storyboard.",
       "url": ".?action=storyboard",
-      "icons": [{ "src": "icons/otto-reference.png", "sizes": "1024x1024", "type": "image/png" }]
+      "icons": [{ "src": "icons/app-icon-192.png", "sizes": "192x192", "type": "image/png" }]
     }
   ]
 }

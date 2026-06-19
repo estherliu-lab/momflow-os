@@ -1,4 +1,4 @@
-const CACHE_NAME = "momflow-cache-v6";
+const CACHE_NAME = "momflow-cache-v7";
 const scopePath = new URL(self.registration.scope).pathname.replace(/\/$/, "");
 const withScope = (path) => `${scopePath}${path}`;
 const APP_SHELL = [
@@ -6,8 +6,10 @@ const APP_SHELL = [
   withScope("/index.html"),
   withScope("/offline.html"),
   withScope("/manifest.json"),
-  withScope("/icons/otto-reference.png"),
-  withScope("/icons/otto-icon.svg")
+  withScope("/icons/app-icon-192.png"),
+  withScope("/icons/app-icon-512.png"),
+  withScope("/icons/app-icon-1024.png"),
+  withScope("/icons/otto-reference.png")
 ];
 
 self.addEventListener("install", (event) => {

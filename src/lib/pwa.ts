@@ -71,7 +71,7 @@ export async function showTestReminder(options?: { title?: string; body?: string
 
   const title = options?.title ?? "MomFlow reminder";
   const body = options?.body ?? "Your next tiny step is waiting here.";
-  const icon = `${import.meta.env.BASE_URL}icons/otto-icon.svg`;
+  const icon = `${import.meta.env.BASE_URL}icons/app-icon-192.png`;
 
   try {
     if ("serviceWorker" in navigator) {
