@@ -348,6 +348,12 @@ svg {
   box-shadow: 0 10px 28px rgba(74, 53, 40, 0.2);
 }
 
+.install-card button:disabled, .primary:disabled {
+  cursor: wait;
+  opacity: 0.72;
+  box-shadow: none;
+}
+
 .primary.wide { width: 100%; min-height: 54px; font-weight: 700; }
 
 .section-heading {
@@ -428,6 +434,13 @@ textarea {
 .voice-input button.listening {
   color: #fffaf2;
   background: #b47f48;
+}
+
+.voice-message {
+  margin: 8px 4px 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
 }
 
 .quick-grid {

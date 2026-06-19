@@ -6,6 +6,7 @@ import { canInstall, isStandalone, promptInstall, requestReminderPermission, set
 import { storage } from "./lib/storage";
 import { t } from "./i18n";
 import { aiProviderPresets } from "./lib/ai/providers";
+import { generateWithAi } from "./lib/ai/adapter";
 import type { AppSettings, DailyState, Idea, Language, PipelineItem, Tab } from "./types";
 
 const defaultSettings: AppSettings = {
@@ -34,6 +35,9 @@ export default function App() {
   const [contentType, setContentType] = useState(contentTypes[0]);
   const [style, setStyle] = useState(styles[0]);
   const [output, setOutput] = useState("");
+  const [generationStatus, setGenerationStatus] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [voiceMessage, setVoiceMessage] = useState("");
   const [installReady, setInstallReady] = useState(false);
   const [listeningTarget, setListeningTarget] = useState<"idea" | "create" | null>(null);
 
@@ -128,8 +132,46 @@ export default function App() {
   async function generate() {
     const input = createInput.trim() || ideaText.trim();
     if (!input) return;
-    const generated = generateLocalContent(input, labelPlatform(platform, language), contentType, labelStyle(style, language), language);
-    setOutput(generated);
+    const localFallback = () => generateLocalContent(input, labelPlatform(platform, language), contentType, labelStyle(style, language), language);
+    setIsGenerating(true);
+    setGenerationStatus(isZh ? "正在生成..." : "Generating...");
+    try {
+      const prompt = buildGenerationPrompt({
+        input,
+        platform: labelPlatform(platform, language),
+        contentType: labelContentType(contentType, language),
+        style: labelStyle(style, language),
+        language
+      });
+      const result = await generateWithAi({
+        provider: settings.aiProvider,
+        apiKey: settings.apiKey,
+        baseUrl: settings.baseUrl,
+        model: settings.model,
+        temperature: settings.temperature,
+        prompt
+      });
+      if (result.mode === "ai") {
+        setOutput(result.text);
+        setGenerationStatus(isZh ? "已使用联网 AI 生成。" : "Generated with online AI.");
+      } else {
+        setOutput(localFallback());
+        setGenerationStatus(
+          isZh
+            ? "当前未配置可用 AI，已使用本地模板。想要真实联网生成，请到“我的”里填写供应商、模型和 API Key。"
+            : "No usable AI configuration found, so MomFlow used local templates. Add provider, model, and API key in Settings for online AI."
+        );
+      }
+    } catch (error) {
+      setOutput(localFallback());
+      setGenerationStatus(
+        isZh
+          ? "联网 AI 调用失败，已先用本地模板兜底。常见原因是 API Key、接口地址、模型名错误，或供应商不允许浏览器直接调用。"
+          : "Online AI failed, so MomFlow used local templates. Common causes: API key, endpoint, model name, or browser CORS restrictions."
+      );
+    } finally {
+      setIsGenerating(false);
+    }
   }
 
   async function saveOutput() {
@@ -161,7 +203,7 @@ export default function App() {
   function startVoiceInput(target: "idea" | "create") {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      window.alert(isZh ? "当前浏览器暂不支持语音输入，可以先用系统键盘里的语音按钮。" : "This browser does not support voice input. Try the microphone on your system keyboard.");
+      setVoiceMessage(isZh ? "当前浏览器不支持网页语音识别。可以点输入框后使用手机键盘自带的麦克风，或直接手动输入。" : "This browser does not support web speech recognition. Use your keyboard microphone or type manually.");
       return;
     }
 
@@ -169,20 +211,30 @@ export default function App() {
     recognition.lang = language;
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
-    recognition.onstart = () => setListeningTarget(target);
+    recognition.onstart = () => {
+      setVoiceMessage(isZh ? "正在听，请说出你的灵感..." : "Listening. Say your idea...");
+      setListeningTarget(target);
+    };
     recognition.onend = () => setListeningTarget(null);
-    recognition.onerror = () => setListeningTarget(null);
+    recognition.onerror = () => {
+      setListeningTarget(null);
+      setVoiceMessage(isZh ? "这次没有识别成功。可以再试一次，或用手机键盘麦克风/手动输入继续。" : "Speech was not recognized. Try again, use your keyboard microphone, or type manually.");
+    };
     recognition.onresult = (event: any) => {
       const transcript = Array.from(event.results)
         .map((result: any) => result[0]?.transcript ?? "")
         .join("")
         .trim();
-      if (!transcript) return;
+      if (!transcript) {
+        setVoiceMessage(isZh ? "没有听到内容，可以再试一次。" : "No speech was captured. Try again.");
+        return;
+      }
       if (target === "idea") {
         setIdeaText((value) => [value, transcript].filter(Boolean).join(value ? "\n" : ""));
       } else {
         setCreateInput((value) => [value, transcript].filter(Boolean).join(value ? "\n" : ""));
       }
+      setVoiceMessage(isZh ? "已识别并填入输入框。" : "Recognized and added to the input.");
     };
     recognition.start();
   }
@@ -295,6 +347,7 @@ export default function App() {
                 onVoice={() => startVoiceInput("idea")}
                 voiceLabel={isZh ? "语音输入" : "Voice input"}
                 listeningLabel={isZh ? "正在听..." : "Listening..."}
+                message={voiceMessage}
               />
               <button className="primary" onClick={() => saveIdea()}>{t(language, "saveIdea")}</button>
             </div>
@@ -323,6 +376,7 @@ export default function App() {
                 onVoice={() => startVoiceInput("create")}
                 voiceLabel={isZh ? "语音输入" : "Voice input"}
                 listeningLabel={isZh ? "正在听..." : "Listening..."}
+                message={voiceMessage}
               />
               <div className="form-grid">
                 <Select label={t(language, "platform")} value={platform} onChange={setPlatform} options={localizedPlatforms} />
@@ -330,7 +384,8 @@ export default function App() {
                 <Select label={t(language, "style")} value={style} onChange={setStyle} options={localizedStyles} />
               </div>
               <p className="hint">{t(language, "localMode")}</p>
-              <button className="primary" onClick={generate}>{t(language, "generate")}</button>
+              {generationStatus && <p className="hint">{generationStatus}</p>}
+              <button className="primary" onClick={generate} disabled={isGenerating}>{isGenerating ? (isZh ? "生成中..." : "Generating...") : t(language, "generate")}</button>
             </div>
             {output && (
               <article className="output">
@@ -476,7 +531,8 @@ function VoiceTextarea({
   isListening,
   onVoice,
   voiceLabel,
-  listeningLabel
+  listeningLabel,
+  message
 }: {
   value: string;
   onChange: (value: string) => void;
@@ -485,6 +541,7 @@ function VoiceTextarea({
   onVoice: () => void;
   voiceLabel: string;
   listeningLabel: string;
+  message?: string;
 }) {
   return (
     <div className="voice-input">
@@ -493,6 +550,7 @@ function VoiceTextarea({
         <Mic />
         <span>{isListening ? listeningLabel : voiceLabel}</span>
       </button>
+      {message && <p className="voice-message">{message}</p>}
     </div>
   );
 }
@@ -581,6 +639,48 @@ function labelCategory(value: string, language: Language) {
     "个人反思": "Personal reflection"
   };
   return labels[value] ?? value;
+}
+
+function buildGenerationPrompt({
+  input,
+  platform,
+  contentType,
+  style,
+  language
+}: {
+  input: string;
+  platform: string;
+  contentType: string;
+  style: string;
+  language: Language;
+}) {
+  if (language === "zh-CN") {
+    return `请根据下面的真实灵感生成一份新内容，不要套固定模板。
+
+灵感：${input}
+平台：${platform}
+内容类型：${contentType}
+风格：${style}
+
+要求：
+1. 内容必须紧扣用户输入的灵感，不能泛泛而谈。
+2. 给出标题、开头、正文/脚本结构、发布建议。
+3. 如果是视频分镜，请按镜头列出时间、画面、字幕、声音和转场。
+4. 语气温柔、实用、有一点陪伴感。`;
+  }
+
+  return `Create fresh content from this exact idea. Do not reuse a fixed template.
+
+Idea: ${input}
+Platform: ${platform}
+Content type: ${contentType}
+Style: ${style}
+
+Requirements:
+1. Stay specific to the user's idea.
+2. Include title options, opening hook, body/script structure, and publishing advice.
+3. If it is a storyboard, list time, shot, caption, sound, and transition.
+4. Keep the tone warm, practical, and gently supportive.`;
 }
 
 type IconName = "home" | "bulb" | "pen" | "link" | "bars" | "gear" | "sun" | "arrow";

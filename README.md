@@ -97,7 +97,7 @@ npm run preview
 
 ### AI Setup
 
-MomFlow works even without an API key by using local templates. For stronger generation, connect a model provider in **Settings**:
+MomFlow works even without an API key by using local templates. For real online generation, connect a model provider in **Settings** by adding provider, endpoint, model, and API key:
 
 - DeepSeek
 - DashScope / Qwen
@@ -108,6 +108,10 @@ MomFlow works even without an API key by using local templates. For stronger gen
 - OpenAI
 
 For production, use a backend proxy instead of calling model APIs directly from the browser. This protects API keys and lets you add rate limits, user accounts, moderation, and billing later.
+
+### Voice Input Note
+
+Voice input uses the browser's built-in speech recognition when available. Some mobile browsers and in-app browsers do not support it. In that case, tap the text box and use your phone keyboard microphone, or type manually.
 
 ### Mainland China Notes
 
@@ -234,7 +238,7 @@ npm run preview
 
 ### AI 设置
 
-不填 API Key 也能使用本地模板。想要更强的生成效果，可以在“我的 / 设置”里连接模型供应商：
+不填 API Key 也能使用本地模板。想要真实联网生成，需要在“我的 / 设置”里填写供应商、接口地址、模型和 API Key：
 
 - DeepSeek
 - 阿里云百炼 / 通义千问
@@ -245,6 +249,10 @@ npm run preview
 - OpenAI
 
 正式上线时建议使用后端代理调用模型，避免 API Key 暴露在浏览器里。
+
+### 语音输入说明
+
+语音输入会优先使用浏览器自带语音识别。部分手机浏览器、微信内置浏览器可能不支持网页语音识别。这种情况下，可以点输入框后使用手机键盘自带麦克风，或直接手动输入。
 
 ### 中国大陆使用说明
 
