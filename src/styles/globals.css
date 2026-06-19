@@ -342,7 +342,7 @@ svg {
 .install-card p, .install-card small { margin: 0; color: var(--muted); line-height: 1.6; }
 .home-shell .install-card h3 { font-size: 15px; margin-bottom: 2px; }
 .home-shell .install-card p { font-size: 12px; line-height: 1.45; }
-.home-shell .install-card small { display: none; }
+.home-shell .install-card small { display: block; font-size: 11px; line-height: 1.35; margin-top: 2px; }
 .home-shell .install-card button { padding: 9px 12px; font-size: 12px; white-space: nowrap; }
 .install-card button, .primary {
   border: 0;
@@ -360,6 +360,21 @@ svg {
 }
 
 .primary.wide { width: 100%; min-height: 54px; font-weight: 700; }
+
+.install-steps {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 10px 12px 10px 30px;
+  border-radius: 14px;
+  background: rgba(255, 250, 242, 0.72);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.install-steps li + li {
+  margin-top: 4px;
+}
 
 .section-heading {
   display: flex;

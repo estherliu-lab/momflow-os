@@ -509,18 +509,36 @@ export default function App() {
 
 function InstallCard({ language, installReady }: { language: Language; installReady: boolean }) {
   const [hidden, setHidden] = useState(isStandalone());
+  const [showSteps, setShowSteps] = useState(false);
+  const isZh = language === "zh-CN";
   if (hidden) return null;
   return (
     <section className="install-card">
       <div>
         <h3>{t(language, "installTitle")}</h3>
         <p>{t(language, "installBody")}</p>
-        <small>{t(language, "iosInstall")} {t(language, "androidInstall")}</small>
+        <small>{isZh ? "浏览器不会允许网页自动添加到桌面，需要你手动确认一次。" : "Browsers require users to confirm before adding a website to the home screen."}</small>
       </div>
       <button onClick={async () => {
+        if (!installReady) {
+          setShowSteps((value) => !value);
+          return;
+        }
         const result = await promptInstall();
-        if (result === "accepted") setHidden(true);
-      }}>{installReady ? t(language, "installButton") : t(language, "installFallback")}</button>
+        if (result === "accepted") {
+          setHidden(true);
+          return;
+        }
+        setShowSteps(true);
+      }}>{installReady ? t(language, "installButton") : (isZh ? "查看安装步骤" : "View install steps")}</button>
+      {showSteps && (
+        <ol className="install-steps">
+          <li>{isZh ? "iPhone：请用 Safari 打开网页，点底部分享按钮。" : "iPhone: open this page in Safari and tap the Share button."}</li>
+          <li>{isZh ? "选择“添加到主屏幕”，再点“添加”。" : "Choose Add to Home Screen, then tap Add."}</li>
+          <li>{isZh ? "Android：请用 Chrome 打开网页，点右上角菜单。" : "Android: open this page in Chrome and tap the menu."}</li>
+          <li>{isZh ? "选择“安装应用”或“添加到主屏幕”。" : "Choose Install app or Add to Home screen."}</li>
+        </ol>
+      )}
     </section>
   );
 }

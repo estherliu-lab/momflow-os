@@ -82,6 +82,8 @@ npm run preview
 
 ### Add To Home Screen
 
+Browsers do not allow websites to add themselves to the home screen automatically. The user must confirm it once.
+
 **iPhone / Safari**
 
 1. Open the deployed site in Safari.
@@ -224,6 +226,8 @@ npm run preview
 7. 把它添加到手机桌面，下次有灵感时直接打开。
 
 ### 添加到手机桌面
+
+浏览器不允许网页自动把自己放到桌面，必须由用户手动确认一次。
 
 **iPhone / Safari**
 
