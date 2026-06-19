@@ -65,11 +65,30 @@ export async function requestReminderPermission() {
   return Notification.requestPermission();
 }
 
-export function showTestReminder() {
-  if (!("Notification" in window) || Notification.permission !== "granted") return false;
-  new Notification("抱抱獭帮你夹住这里了", {
-    body: "不用重新开始，下次从这个断点继续就好。",
-    icon: `${import.meta.env.BASE_URL}icons/otto-icon.svg`
-  });
-  return true;
+export async function showTestReminder(options?: { title?: string; body?: string }) {
+  if (!("Notification" in window)) return { ok: false, reason: "unsupported" as const };
+  if (Notification.permission !== "granted") return { ok: false, reason: Notification.permission };
+
+  const title = options?.title ?? "MomFlow reminder";
+  const body = options?.body ?? "Your next tiny step is waiting here.";
+  const icon = `${import.meta.env.BASE_URL}icons/otto-icon.svg`;
+
+  try {
+    if ("serviceWorker" in navigator) {
+      const registration = await navigator.serviceWorker.ready;
+      if (registration?.showNotification) {
+        await registration.showNotification(title, { body, icon, badge: icon });
+        return { ok: true as const };
+      }
+    }
+    new Notification(title, { body, icon });
+    return { ok: true as const };
+  } catch {
+    try {
+      new Notification(title, { body, icon });
+      return { ok: true as const };
+    } catch {
+      return { ok: false, reason: "failed" as const };
+    }
+  }
 }

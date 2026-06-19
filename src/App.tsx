@@ -50,6 +50,7 @@ export default function App() {
   const [generationStatus, setGenerationStatus] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [voiceMessages, setVoiceMessages] = useState({ idea: "", create: "" });
+  const [reminderStatus, setReminderStatus] = useState("");
   const [installReady, setInstallReady] = useState(false);
   const [listeningTarget, setListeningTarget] = useState<"idea" | "create" | null>(null);
 
@@ -209,6 +210,55 @@ export default function App() {
     await storage.clearAll();
     setIdeas([]);
     setPipeline([]);
+  }
+
+  async function enableReminders() {
+    const permission = await requestReminderPermission();
+    const enabled = permission === "granted";
+    await updateSettings({ ...settings, remindersEnabled: enabled });
+
+    if (permission === "unsupported") {
+      setReminderStatus(isZh ? "当前浏览器不支持桌面通知。手机端建议先添加到桌面后再试。" : "This browser does not support notifications. On mobile, add the app to your home screen first.");
+      return;
+    }
+    if (permission === "denied") {
+      setReminderStatus(isZh ? "通知权限被拒绝了。请到浏览器/系统设置里允许此网站通知。" : "Notification permission was denied. Allow notifications for this site in browser or system settings.");
+      return;
+    }
+    if (permission !== "granted") {
+      setReminderStatus(isZh ? "还没有获得通知权限。请在弹窗里选择允许。" : "Notification permission was not granted yet. Choose Allow in the browser prompt.");
+      return;
+    }
+
+    const result = await showTestReminder({
+      title: isZh ? "抱抱獭提醒已开启" : "MomFlow reminders are on",
+      body: isZh ? "以后可以用通知把断点和下一步带回来。" : "Notifications can bring you back to your next tiny step."
+    });
+    setReminderStatus(
+      result.ok
+        ? (isZh ? "提醒已开启，并已发送一条测试通知。" : "Reminders are enabled. A test notification was sent.")
+        : (isZh ? "权限已开启，但测试通知没有发出。手机端请确认已添加到桌面。" : "Permission is enabled, but the test notification did not show. On mobile, make sure the app is added to your home screen.")
+    );
+  }
+
+  async function testReminder() {
+    const result = await showTestReminder({
+      title: isZh ? "抱抱獭帮你夹住这里了" : "MomFlow saved your place",
+      body: isZh ? "不用重新开始，下次从这个断点继续就好。" : "No need to restart. Continue from this checkpoint next time."
+    });
+    if (result.ok) {
+      setReminderStatus(isZh ? "测试提醒已发送。" : "Test reminder sent.");
+      return;
+    }
+    if (result.reason === "unsupported") {
+      setReminderStatus(isZh ? "当前浏览器不支持通知。请尝试 Chrome/Safari，并先添加到桌面。" : "This browser does not support notifications. Try Chrome/Safari and add it to the home screen first.");
+      return;
+    }
+    if (result.reason === "denied") {
+      setReminderStatus(isZh ? "通知权限被拒绝。请到浏览器/系统设置里重新允许。" : "Notifications are blocked. Re-enable them in browser or system settings.");
+      return;
+    }
+    setReminderStatus(isZh ? "还没有开启通知权限，请先点“开启提醒”。" : "Notification permission is not enabled. Tap Enable reminders first.");
   }
 
   function startVoiceInput(target: "idea" | "create") {
@@ -476,13 +526,11 @@ export default function App() {
             <section className="panel">
               <h3>{isZh ? "桌面提醒" : "Desktop reminders"}</h3>
               <div className="button-row">
-                <button onClick={async () => {
-                  const permission = await requestReminderPermission();
-                  updateSettings({ ...settings, remindersEnabled: permission === "granted" });
-                }}>{t(language, "enableReminder")}</button>
-                <button onClick={showTestReminder}>{t(language, "testReminder")}</button>
+                <button onClick={enableReminders}>{t(language, "enableReminder")}</button>
+                <button onClick={testReminder}>{t(language, "testReminder")}</button>
               </div>
-              <p className="hint">{isZh ? "PWA 能做桌面图标、角标、通知和长按快捷入口；真正桌面宠物需要后续原生 App 或小组件。" : "A PWA can provide a home-screen icon, badges, notifications, and long-press shortcuts. A true desktop pet would require a native app or widget."}</p>
+              {reminderStatus && <p className="status-note">{reminderStatus}</p>}
+              <p className="hint">{isZh ? "通知需要浏览器和系统允许。手机端建议先添加到桌面，再开启提醒；真正定时推送需要后端 Web Push。" : "Notifications require browser and system permission. On mobile, add the app to the home screen first. Scheduled push reminders require backend Web Push."}</p>
             </section>
             <section className="panel">
               <h3>{isZh ? "数据" : "Data"}</h3>

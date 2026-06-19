@@ -462,6 +462,16 @@ textarea {
   line-height: 1.5;
 }
 
+.status-note {
+  margin: 10px 0 0;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(168, 183, 161, 0.18);
+  color: #50664a;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
 .quick-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
