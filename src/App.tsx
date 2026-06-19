@@ -11,16 +11,28 @@ import type { AppSettings, DailyState, Idea, Language, PipelineItem, Tab } from 
 
 const defaultSettings: AppSettings = {
   language: "zh-CN",
-  aiProvider: "local-template",
+  aiProvider: "deepseek",
   apiKey: "",
-  baseUrl: "",
-  model: "",
+  baseUrl: "https://api.deepseek.com",
+  model: "deepseek-chat",
   temperature: 0.7,
   remindersEnabled: false
 };
 
 function byNewest<T extends { createdAt: string }>(items: T[]) {
   return [...items].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+function normalizeSettings(settings: AppSettings): AppSettings {
+  if (settings.aiProvider === "local-template") {
+    return {
+      ...settings,
+      aiProvider: "deepseek",
+      baseUrl: settings.baseUrl || "https://api.deepseek.com",
+      model: settings.model || "deepseek-chat"
+    };
+  }
+  return settings;
 }
 
 export default function App() {
@@ -37,7 +49,7 @@ export default function App() {
   const [output, setOutput] = useState("");
   const [generationStatus, setGenerationStatus] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [voiceMessage, setVoiceMessage] = useState("");
+  const [voiceMessages, setVoiceMessages] = useState({ idea: "", create: "" });
   const [installReady, setInstallReady] = useState(false);
   const [listeningTarget, setListeningTarget] = useState<"idea" | "create" | null>(null);
 
@@ -61,7 +73,7 @@ export default function App() {
   useEffect(() => {
     storage.getIdeas().then((items) => setIdeas(byNewest(items)));
     storage.getPipeline().then((items) => setPipeline(byNewest(items)));
-    storage.getSettings().then((saved) => saved && setSettings(saved));
+    storage.getSettings().then((saved) => saved && setSettings(normalizeSettings(saved)));
     setInstallReady(canInstall());
     const listener = () => setInstallReady(true);
     window.addEventListener("momflow-install-ready", listener);
@@ -132,9 +144,9 @@ export default function App() {
   async function generate() {
     const input = createInput.trim() || ideaText.trim();
     if (!input) return;
-    const localFallback = () => generateLocalContent(input, labelPlatform(platform, language), contentType, labelStyle(style, language), language);
     setIsGenerating(true);
     setGenerationStatus(isZh ? "正在生成..." : "Generating...");
+    setOutput("");
     try {
       const prompt = buildGenerationPrompt({
         input,
@@ -149,25 +161,24 @@ export default function App() {
         baseUrl: settings.baseUrl,
         model: settings.model,
         temperature: settings.temperature,
+        proxyUrl: import.meta.env.VITE_MOMFLOW_AI_PROXY_URL,
         prompt
       });
       if (result.mode === "ai") {
         setOutput(result.text);
-        setGenerationStatus(isZh ? "已使用联网 AI 生成。" : "Generated with online AI.");
+        setGenerationStatus(isZh ? "已连接 DeepSeek / AI 生成。" : "Generated with DeepSeek / online AI.");
       } else {
-        setOutput(localFallback());
         setGenerationStatus(
           isZh
-            ? "当前未配置可用 AI，已使用本地模板。想要真实联网生成，请到“我的”里填写供应商、模型和 API Key。"
-            : "No usable AI configuration found, so MomFlow used local templates. Add provider, model, and API key in Settings for online AI."
+            ? "DeepSeek 还没有真正连接。公开网页不能直接内置 API Key，需要配置后端代理，或在“我的”里填写自己的 DeepSeek API Key。"
+            : "DeepSeek is not connected yet. A public static site cannot safely include an API key. Configure a backend proxy or add your own DeepSeek API key in Settings."
         );
       }
     } catch (error) {
-      setOutput(localFallback());
       setGenerationStatus(
         isZh
-          ? "联网 AI 调用失败，已先用本地模板兜底。常见原因是 API Key、接口地址、模型名错误，或供应商不允许浏览器直接调用。"
-          : "Online AI failed, so MomFlow used local templates. Common causes: API key, endpoint, model name, or browser CORS restrictions."
+          ? "DeepSeek 调用失败。常见原因是没有后端代理、API Key 错误、模型名错误，或浏览器被 CORS 拦截。"
+          : "DeepSeek call failed. Common causes: missing backend proxy, wrong API key, wrong model name, or browser CORS restrictions."
       );
     } finally {
       setIsGenerating(false);
@@ -201,6 +212,7 @@ export default function App() {
   }
 
   function startVoiceInput(target: "idea" | "create") {
+    const setVoiceMessage = (message: string) => setVoiceMessages((current) => ({ ...current, [target]: message }));
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
       setVoiceMessage(isZh ? "当前浏览器不支持网页语音识别。可以点输入框后使用手机键盘自带的麦克风，或直接手动输入。" : "This browser does not support web speech recognition. Use your keyboard microphone or type manually.");
@@ -347,7 +359,7 @@ export default function App() {
                 onVoice={() => startVoiceInput("idea")}
                 voiceLabel={isZh ? "语音输入" : "Voice input"}
                 listeningLabel={isZh ? "正在听..." : "Listening..."}
-                message={voiceMessage}
+                message={voiceMessages.idea}
               />
               <button className="primary" onClick={() => saveIdea()}>{t(language, "saveIdea")}</button>
             </div>
@@ -376,14 +388,14 @@ export default function App() {
                 onVoice={() => startVoiceInput("create")}
                 voiceLabel={isZh ? "语音输入" : "Voice input"}
                 listeningLabel={isZh ? "正在听..." : "Listening..."}
-                message={voiceMessage}
+                message={voiceMessages.create}
               />
               <div className="form-grid">
                 <Select label={t(language, "platform")} value={platform} onChange={setPlatform} options={localizedPlatforms} />
                 <Select label={t(language, "contentType")} value={contentType} onChange={setContentType} options={localizedContentTypes} />
                 <Select label={t(language, "style")} value={style} onChange={setStyle} options={localizedStyles} />
               </div>
-              <p className="hint">{t(language, "localMode")}</p>
+              <p className="hint">{isZh ? "默认使用 DeepSeek。若未配置安全代理或 API Key，系统会提示未连接，不再假装联网生成。" : "DeepSeek is the default provider. If no secure proxy or API key is configured, MomFlow will show a connection warning instead of fake generation."}</p>
               {generationStatus && <p className="hint">{generationStatus}</p>}
               <button className="primary" onClick={generate} disabled={isGenerating}>{isGenerating ? (isZh ? "生成中..." : "Generating...") : t(language, "generate")}</button>
             </div>
@@ -458,7 +470,7 @@ export default function App() {
               <input value={settings.model} onChange={(event) => updateSettings({ ...settings, model: event.target.value })} placeholder={isZh ? "模型名称" : "Model name"} />
               <input value={settings.baseUrl} onChange={(event) => updateSettings({ ...settings, baseUrl: event.target.value })} placeholder={isZh ? "自定义接口地址" : "Custom endpoint"} />
               <input value={settings.apiKey} onChange={(event) => updateSettings({ ...settings, apiKey: event.target.value })} placeholder={isZh ? "API Key 仅保存在本机" : "API Key stays local"} type="password" />
-              <p className="hint">{t(language, "localMode")}</p>
+              <p className="hint">{isZh ? "默认连接 DeepSeek。公开网页要让所有用户免配置使用，需要先部署后端代理保护 API Key。" : "DeepSeek is the default provider. To make it work for every visitor without setup, deploy a backend proxy to protect the API key first."}</p>
               <p className="hint">{isZh ? "大陆用户建议优先选择 DeepSeek、阿里云百炼、智谱、火山方舟或百度千帆。正式上线时建议通过后端代理调用，避免 API Key 暴露在浏览器里。" : "For mainland China users, prefer DeepSeek, DashScope, Zhipu GLM, Volcengine Ark, or Baidu Qianfan. Use a backend proxy in production to protect API keys."}</p>
             </section>
             <section className="panel">

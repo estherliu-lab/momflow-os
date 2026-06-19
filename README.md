@@ -109,6 +109,8 @@ MomFlow works even without an API key by using local templates. For real online 
 
 For production, use a backend proxy instead of calling model APIs directly from the browser. This protects API keys and lets you add rate limits, user accounts, moderation, and billing later.
 
+DeepSeek proxy guide: [docs/deepseek-proxy.md](docs/deepseek-proxy.md)
+
 ### Voice Input Note
 
 Voice input uses the browser's built-in speech recognition when available. Some mobile browsers and in-app browsers do not support it. In that case, tap the text box and use your phone keyboard microphone, or type manually.
@@ -249,6 +251,8 @@ npm run preview
 - OpenAI
 
 正式上线时建议使用后端代理调用模型，避免 API Key 暴露在浏览器里。
+
+DeepSeek 代理配置说明：[docs/deepseek-proxy.md](docs/deepseek-proxy.md)
 
 ### 语音输入说明
 
