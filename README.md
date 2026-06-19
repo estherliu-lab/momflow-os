@@ -132,28 +132,6 @@ MomFlow can serve mainland China users, but deployment should avoid overseas-onl
 
 More details: [docs/mainland-china-guide.md](docs/mainland-china-guide.md)
 
-### Project Structure
-
-```text
-src/
-  App.tsx                  Main mobile-first PWA interface
-  config.ts                Character, modes, platforms, styles
-  i18n.ts                  Chinese and English copy
-  lib/
-    generator.ts           Local generation templates
-    pwa.ts                 Install, reminders, service worker helpers
-    storage.ts             IndexedDB storage
-    ai/providers.ts        Model provider presets
-public/
-  manifest.json            PWA manifest
-  sw.js                    Service worker
-  offline.html             Offline fallback
-  icons/                   Otto app icons
-docs/
-  mainland-china-guide.md  Mainland deployment and AI notes
-  user-guide.md            End-user usage guide
-```
-
 ### Roadmap
 
 - Real AI generation through a backend proxy
@@ -281,28 +259,6 @@ MomFlow 可以面向中国大陆用户使用，但部署时建议：
 
 更多说明：[docs/mainland-china-guide.md](docs/mainland-china-guide.md)
 
-### 项目结构
-
-```text
-src/
-  App.tsx                  手机优先的 PWA 主界面
-  config.ts                角色、模式、平台、风格配置
-  i18n.ts                  中文和英文文案
-  lib/
-    generator.ts           本地生成模板
-    pwa.ts                 安装、提醒、Service Worker 辅助函数
-    storage.ts             IndexedDB 本地存储
-    ai/providers.ts        AI 供应商预设
-public/
-  manifest.json            PWA manifest
-  sw.js                    Service Worker
-  offline.html             离线页
-  icons/                   Otto 图标
-docs/
-  mainland-china-guide.md  中国大陆部署和 AI 接入说明
-  user-guide.md            用户使用指南
-```
-
 ### 后续路线
 
 - 通过后端代理接入真实 AI 生成
@@ -311,6 +267,12 @@ docs/
 - 增加账号同步和云备份
 - 做原生小组件或 App 版本，让 Otto 有更丰富的桌面陪伴能力
 
-## License
+## License / 版权
 
-MIT
+Code is released under the MIT License. See [LICENSE](LICENSE).
+
+Brand names, product names, Otto character artwork, app icons, illustrations, visual identity, and other brand assets are not included in the MIT commercial reuse grant. See [BRAND_NOTICE.md](BRAND_NOTICE.md).
+
+代码使用 MIT License 开源，详见 [LICENSE](LICENSE)。
+
+品牌名称、产品名称、Otto 小动物形象、应用图标、插画、视觉识别和其他品牌资产，不包含在 MIT 的商业复用授权范围内。详见 [BRAND_NOTICE.md](BRAND_NOTICE.md)。
