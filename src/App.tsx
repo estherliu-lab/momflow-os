@@ -50,6 +50,7 @@ export default function App() {
   const [generationStatus, setGenerationStatus] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [voiceMessages, setVoiceMessages] = useState({ idea: "", create: "" });
+  const [voiceDrafts, setVoiceDrafts] = useState({ idea: "", create: "" });
   const [reminderStatus, setReminderStatus] = useState("");
   const [installReady, setInstallReady] = useState(false);
   const [listeningTarget, setListeningTarget] = useState<"idea" | "create" | null>(null);
@@ -263,6 +264,7 @@ export default function App() {
 
   function startVoiceInput(target: "idea" | "create") {
     const setVoiceMessage = (message: string) => setVoiceMessages((current) => ({ ...current, [target]: message }));
+    const setVoiceDraft = (message: string) => setVoiceDrafts((current) => ({ ...current, [target]: message }));
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
       setVoiceMessage(isZh ? "当前浏览器不支持网页语音识别。可以点输入框后使用手机键盘自带的麦克风，或直接手动输入。" : "This browser does not support web speech recognition. Use your keyboard microphone or type manually.");
@@ -270,32 +272,67 @@ export default function App() {
     }
 
     const recognition = new SpeechRecognition();
-    recognition.lang = language;
-    recognition.interimResults = false;
+    recognition.lang = isZh ? "zh-CN" : "en-US";
+    recognition.interimResults = true;
+    recognition.continuous = false;
     recognition.maxAlternatives = 1;
     recognition.onstart = () => {
       setVoiceMessage(isZh ? "正在听，请说出你的灵感..." : "Listening. Say your idea...");
+      setVoiceDraft("");
       setListeningTarget(target);
     };
-    recognition.onend = () => setListeningTarget(null);
-    recognition.onerror = () => {
+    recognition.onspeechstart = () => setVoiceMessage(isZh ? "听到了，正在识别..." : "Speech detected. Recognizing...");
+    recognition.onspeechend = () => setVoiceMessage(isZh ? "识别中，请稍等..." : "Finishing recognition...");
+    recognition.onend = () => {
       setListeningTarget(null);
-      setVoiceMessage(isZh ? "这次没有识别成功。可以再试一次，或用手机键盘麦克风/手动输入继续。" : "Speech was not recognized. Try again, use your keyboard microphone, or type manually.");
+      setVoiceDraft("");
+    };
+    recognition.onerror = (event: any) => {
+      setListeningTarget(null);
+      setVoiceDraft("");
+      const error = event?.error;
+      const messageZh: Record<string, string> = {
+        "not-allowed": "麦克风权限被拒绝了。请在浏览器/系统设置里允许麦克风，或用手机键盘麦克风输入。",
+        "audio-capture": "没有检测到可用麦克风。请检查系统麦克风权限。",
+        "no-speech": "没有听到语音。请靠近麦克风再试一次。",
+        network: "语音识别服务网络连接失败。可以换 Chrome/Safari，或用手机键盘麦克风。"
+      };
+      const messageEn: Record<string, string> = {
+        "not-allowed": "Microphone permission was blocked. Allow microphone access in browser/system settings, or use your keyboard microphone.",
+        "audio-capture": "No microphone was detected. Check system microphone permission.",
+        "no-speech": "No speech was heard. Try speaking closer to the microphone.",
+        network: "Speech recognition network failed. Try Chrome/Safari, or use your keyboard microphone."
+      };
+      setVoiceMessage((isZh ? messageZh[error] : messageEn[error]) || (isZh ? "这次没有识别成功。可以再试一次，或用手机键盘麦克风/手动输入继续。" : "Speech was not recognized. Try again, use your keyboard microphone, or type manually."));
     };
     recognition.onresult = (event: any) => {
-      const transcript = Array.from(event.results)
-        .map((result: any) => result[0]?.transcript ?? "")
-        .join("")
-        .trim();
-      if (!transcript) {
+      let finalText = "";
+      let interimText = "";
+      for (let index = event.resultIndex; index < event.results.length; index += 1) {
+        const result = event.results[index];
+        const text = result[0]?.transcript ?? "";
+        if (result.isFinal) finalText += text;
+        else interimText += text;
+      }
+
+      if (interimText.trim()) {
+        setVoiceDraft(interimText.trim());
+        setVoiceMessage(isZh ? `正在识别：${interimText.trim()}` : `Recognizing: ${interimText.trim()}`);
+      }
+
+      const transcript = finalText.trim();
+      if (!transcript && !interimText.trim()) {
         setVoiceMessage(isZh ? "没有听到内容，可以再试一次。" : "No speech was captured. Try again.");
         return;
       }
+      if (!transcript) return;
+
       if (target === "idea") {
         setIdeaText((value) => [value, transcript].filter(Boolean).join(value ? "\n" : ""));
       } else {
         setCreateInput((value) => [value, transcript].filter(Boolean).join(value ? "\n" : ""));
       }
+      setVoiceDraft("");
       setVoiceMessage(isZh ? "已识别并填入输入框。" : "Recognized and added to the input.");
     };
     recognition.start();
@@ -410,6 +447,7 @@ export default function App() {
                 voiceLabel={isZh ? "语音输入" : "Voice input"}
                 listeningLabel={isZh ? "正在听..." : "Listening..."}
                 message={voiceMessages.idea}
+                draft={voiceDrafts.idea}
               />
               <button className="primary" onClick={() => saveIdea()}>{t(language, "saveIdea")}</button>
             </div>
@@ -439,6 +477,7 @@ export default function App() {
                 voiceLabel={isZh ? "语音输入" : "Voice input"}
                 listeningLabel={isZh ? "正在听..." : "Listening..."}
                 message={voiceMessages.create}
+                draft={voiceDrafts.create}
               />
               <div className="form-grid">
                 <Select label={t(language, "platform")} value={platform} onChange={setPlatform} options={localizedPlatforms} />
@@ -610,7 +649,8 @@ function VoiceTextarea({
   onVoice,
   voiceLabel,
   listeningLabel,
-  message
+  message,
+  draft
 }: {
   value: string;
   onChange: (value: string) => void;
@@ -620,6 +660,7 @@ function VoiceTextarea({
   voiceLabel: string;
   listeningLabel: string;
   message?: string;
+  draft?: string;
 }) {
   return (
     <div className="voice-input">
@@ -628,6 +669,7 @@ function VoiceTextarea({
         <Mic />
         <span>{isListening ? listeningLabel : voiceLabel}</span>
       </button>
+      {draft && <p className="voice-draft">{draft}</p>}
       {message && <p className="voice-message">{message}</p>}
     </div>
   );

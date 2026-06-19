@@ -462,6 +462,16 @@ textarea {
   line-height: 1.5;
 }
 
+.voice-draft {
+  margin: 0;
+  padding: 9px 11px;
+  border-radius: 12px;
+  background: rgba(243, 212, 122, 0.22);
+  color: #6d5637;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 .status-note {
   margin: 10px 0 0;
   padding: 10px 12px;
