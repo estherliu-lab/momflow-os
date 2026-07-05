@@ -4,11 +4,11 @@
 
 A tiny multilingual AI workspace for fragmented creators.
 
-[Open the app](https://ezekielgarden-arch.github.io/momflow-os/) | [GitHub repository](https://github.com/ezekielgarden-arch/momflow-os)
+[Open the app](https://estherliu-lab.github.io/momflow-os/) | [GitHub repository](https://github.com/estherliu-lab/momflow-os)
 
 <p>
   <strong>Scan to open MomFlow</strong><br />
-  <img src="public/momflow-qr.png" alt="MomFlow QR code" width="160" />
+  <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=https%3A%2F%2Festherliu-lab.github.io%2Fmomflow-os%2F" alt="MomFlow QR code" width="160" />
 </p>
 
 MomFlow is a lightweight PWA that helps creators save ideas, recover from interruptions, and turn scattered thoughts into posts, scripts, and storyboards. It is warm, practical, slightly cute, and designed for real-life days when time never arrives in one perfect block.
@@ -29,7 +29,7 @@ MomFlow OS is also an open-source, lightweight AI workspace template. It does no
 
 Open MomFlow here:
 
-[https://ezekielgarden-arch.github.io/momflow-os/](https://ezekielgarden-arch.github.io/momflow-os/)
+[https://estherliu-lab.github.io/momflow-os/](https://estherliu-lab.github.io/momflow-os/)
 
 ### Why It Is Useful
 
@@ -156,7 +156,7 @@ MomFlow OS / 抱抱獭工作台也是一个开源、轻量、可二次开发的 
 
 打开 MomFlow：
 
-[https://ezekielgarden-arch.github.io/momflow-os/](https://ezekielgarden-arch.github.io/momflow-os/)
+[https://estherliu-lab.github.io/momflow-os/](https://estherliu-lab.github.io/momflow-os/)
 
 ### 为什么它有用
 
@@ -253,7 +253,7 @@ DeepSeek 代理配置说明：[docs/deepseek-proxy.md](docs/deepseek-proxy.md)
 MomFlow 可以面向中国大陆用户使用，但部署时建议：
 
 - 静态资源部署在大陆可访问的服务器或 CDN。
-- 图片和图标都放在项目 `public/` 里。
+- 图片和图标都放在项目 `public/`。
 - 优先选择 DeepSeek、通义千问、智谱 GLM、豆包、百度千帆等大陆用户更容易访问的模型。
 - 如果使用中国大陆正式域名，按需完成 ICP 备案和相关合规步骤。
 
